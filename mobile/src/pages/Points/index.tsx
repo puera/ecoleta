@@ -6,7 +6,7 @@ import { View, StyleSheet, Text, Image,  TouchableOpacity, ScrollView, Alert } f
 import MapView, { Marker } from 'react-native-maps';
 import { SvgUri } from 'react-native-svg';
 import * as Location from 'expo-location';
-import api from '../../services/api';
+import { api } from '../../services/api';
 
 interface Item {
   id: number;

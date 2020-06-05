@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { RectButton } from 'react-native-gesture-handler';
 import * as MailComposer from 'expo-mail-composer';
 
-import api from '../../services/api';
+import { api } from '../../services/api';
 
 interface Params {
   point_id: number;

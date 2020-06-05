@@ -1,13 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, ReactText, useEffect } from 'react';
 import { Feather as Icon } from '@expo/vector-icons';
-import { View, ImageBackground, Image, StyleSheet, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, ImageBackground, Image, StyleSheet, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import { Picker } from '@react-native-community/picker';
+import { ibge } from '../../services/api';
+
+interface IBGEUFResponse {
+  sigla: string;
+}
+
+interface IBGECityResponse {
+  nome: string;
+}
 
 const Home = () => {
   const [uf, setUf] = useState('');
   const [city, setCity] = useState('');
+
+  const [ufs, setUfs] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+
   const navigation = useNavigation();
+
+  useEffect(() => {
+    ibge.get<IBGEUFResponse[]>('estados').then(response => {
+      const ufInitials = response.data.map(uf => uf.sigla);
+
+      setUfs(ufInitials);
+    })
+    
+  }, []);
+
+  useEffect(() => {
+    if (uf === '0') setCities([]);
+    
+    ibge.get<IBGECityResponse[]>(`estados/${uf}/municipios`).then(response => {
+      const cityNames = response.data.map(city => city.nome);
+
+      setCities(cityNames);
+    })
+    
+  }, [uf]);
 
   function handeNavigationToPoints() {
     navigation.navigate('Points', {
@@ -15,6 +49,15 @@ const Home = () => {
       city, 
     });
   }
+
+  function handleSelectUf(value: ReactText) {
+    setUf(String(value));
+  }
+
+  function handleSelectCity(value: ReactText) {
+    setCity(String(value));
+  }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1  }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ImageBackground 
@@ -29,24 +72,27 @@ const Home = () => {
           <Text style={styles.description}>Ajudamos pessoas encontrarem pontos de coleta de forma eficiente. </Text>
         </View>
       </View>
+        <Picker
+          style={styles.input}
+          selectedValue={uf}
+          onValueChange={(itemValue, _) => handleSelectUf(itemValue)}
+        >
+          <Picker.Item label="Selecione uma UF" value="0" />
+          {ufs.map(uf => (
+            <Picker.Item key={uf} label={uf} value={uf} />
+          ))}
+        </Picker>
 
-      <TextInput 
-        style={styles.input}
-        placeholder="Digite a UF"
-        value={uf}
-        maxLength={2}
-        autoCapitalize="characters"
-        autoCorrect={false}
-        onChangeText={setUf}
-        />
-
-      <TextInput 
-        style={styles.input}
-        placeholder="Digite a cidade"
-        value={city}
-        autoCorrect={false}
-        onChangeText={setCity}
-        />          
+        <Picker
+          style={styles.input}
+          selectedValue={city}
+          onValueChange={(itemValue, _) => handleSelectCity(itemValue)}
+        >
+          <Picker.Item label="Selecione uma Cidade" value="0" />
+          {cities.map(city => (
+            <Picker.Item key={city} label={city} value={city} />
+          ))}
+        </Picker>
 
       <View style={styles.footer}>
           <RectButton style={styles.button} onPress={handeNavigationToPoints}>
