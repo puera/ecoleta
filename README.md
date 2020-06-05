@@ -69,6 +69,7 @@ Technologies that I used to develop this api
 - [React Navigation](https://reactnavigation.org/)
 - [React Icons](https://react-icons.netlify.com/#/)
 - [EditorConfig](https://editorconfig.org/)
+- [React Native Picker](https://github.com/react-native-community/react-native-picker)
 
 ## 💻 Getting started
 
